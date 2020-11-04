@@ -1,4 +1,4 @@
-package com.tylerthardy.runelite.osleague;
+package info.osleague.runelite.osleague;
 
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;

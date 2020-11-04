@@ -25,7 +25,7 @@ dependencies {
 	}
 }
 
-group = 'com.tylerthardy.runelite.osleague'
+group = 'info.osleague.runelite.osleague'
 version = '1.0-SNAPSHOT'
 sourceCompatibility = '1.8'
 

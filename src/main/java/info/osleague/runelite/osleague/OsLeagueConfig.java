@@ -1,4 +1,4 @@
-package com.tylerthardy.runelite.osleague;
+package info.osleague.runelite.osleague;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
