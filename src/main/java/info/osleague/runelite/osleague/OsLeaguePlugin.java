@@ -119,8 +119,8 @@ public class OsLeaguePlugin extends Plugin
 
 		OsLeagueImport osLeagueImport = new OsLeagueImport();
 		osLeagueImport.unlockedRegions = gson.toJson(this.areas.stream().map(Area::getName).toArray());
-		osLeagueImport.unlockedRelics = gson.toJson(new OsLeagueRelics(relics));
-		osLeagueImport.tasks = gson.toJson(new OsLeagueTasks(tasks));
+		osLeagueImport.unlockedRelics = gson.toJson(new OsLeagueRelics(this.relics));
+		osLeagueImport.tasks = gson.toJson(new OsLeagueTasks(this.tasks));
 
 		String json = gson.toJson(osLeagueImport);
 		final StringSelection stringSelection = new StringSelection(json);
@@ -164,7 +164,7 @@ public class OsLeaguePlugin extends Plugin
 			Area area = Area.getAreaBySprite(widget.getSpriteId());
 			if (area != null)
 			{
-				this.areas.add(area);
+				areas.add(area);
 			}
 		}
 		return areas;
@@ -185,7 +185,7 @@ public class OsLeaguePlugin extends Plugin
 			Relic relic = Relic.getRelicBySprite(widget.getSpriteId());
 			if (relic != null)
 			{
-				this.relics.add(relic);
+				relics.add(relic);
 			}
 		}
 
