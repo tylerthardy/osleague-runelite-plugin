@@ -75,7 +75,7 @@ public class OsLeaguePlugin extends Plugin
 
 	private NavigationButton titleBarButton;
 
-	private Task[] tasks;
+	private List<Task> tasks;
 	private List<Relic> relics;
 	private List<Area> areas;
 
@@ -121,7 +121,7 @@ public class OsLeaguePlugin extends Plugin
 
 		OsLeagueImport osLeagueImport = new OsLeagueImport();
 		osLeagueImport.unlockedRegions = gson.toJson(this.areas.stream().map(Area::getName).toArray());
-		osLeagueImport.unlockedRelics = gson.toJson(new OsLeagueRelics(relics.toArray(new Relic[relics.size()])));
+		osLeagueImport.unlockedRelics = gson.toJson(new OsLeagueRelics(relics));
 		osLeagueImport.tasks = gson.toJson(new OsLeagueTasks(tasks));
 
 		String json = gson.toJson(osLeagueImport);
@@ -194,7 +194,7 @@ public class OsLeaguePlugin extends Plugin
 		return relics;
 	}
 
-	private Task[] gatherTaskData()
+	private List<Task> gatherTaskData()
 	{
 		Widget taskLabelsWidget = client.getWidget(657, 10);
 		Widget taskPointsWidget = client.getWidget(657, 11);
@@ -212,7 +212,7 @@ public class OsLeaguePlugin extends Plugin
 			return null;
 		}
 
-		Task[] tasks = new Task[taskLabels.length];
+		List<Task> tasks = new ArrayList<>();
 		for (int i = 0; i < taskLabels.length; i++)
 		{
 			String label = taskLabels[i].getText();
@@ -224,7 +224,8 @@ public class OsLeaguePlugin extends Plugin
 				getTaskPoints(taskPoints[i]),
 				isTaskCompleted(taskLabels[i]),
 				taskDifficulties[i].getSpriteId());
-			tasks[i] = task;
+
+			tasks.add(task);
 		}
 
 		return tasks;

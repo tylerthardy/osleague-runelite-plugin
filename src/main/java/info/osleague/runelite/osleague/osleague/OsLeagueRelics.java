@@ -3,6 +3,8 @@ package info.osleague.runelite.osleague.osleague;
 import com.google.gson.annotations.SerializedName;
 import info.osleague.runelite.osleague.Relic;
 
+import java.util.List;
+
 public class OsLeagueRelics
 {
 	@SerializedName("0")
@@ -18,30 +20,29 @@ public class OsLeagueRelics
 	@SerializedName("5")
 	public OsLeagueRelic relic6 = null;
 
-	public OsLeagueRelics(Relic[] relics)
+	public OsLeagueRelics(List<Relic> relics)
 	{
-		for (int i = 0; i < relics.length; i++)
+		for (Relic relic : relics)
 		{
-			int tierId = relics[i].getTierId();
-			switch (tierId)
-			{
+			int tierId = relic.getTierId();
+			switch (tierId) {
 				case 0:
-					relic1 = new OsLeagueRelic(relics[i]);
+					relic1 = new OsLeagueRelic(relic);
 					continue;
 				case 1:
-					relic2 = new OsLeagueRelic(relics[i]);
+					relic2 = new OsLeagueRelic(relic);
 					continue;
 				case 2:
-					relic3 = new OsLeagueRelic(relics[i]);
+					relic3 = new OsLeagueRelic(relic);
 					continue;
 				case 3:
-					relic4 = new OsLeagueRelic(relics[i]);
+					relic4 = new OsLeagueRelic(relic);
 					continue;
 				case 4:
-					relic5 = new OsLeagueRelic(relics[i]);
+					relic5 = new OsLeagueRelic(relic);
 					continue;
 				case 5:
-					relic6 = new OsLeagueRelic(relics[i]);
+					relic6 = new OsLeagueRelic(relic);
 					continue;
 			}
 		}
