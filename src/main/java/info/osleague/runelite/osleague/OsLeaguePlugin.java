@@ -59,9 +59,7 @@ import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 
 @Slf4j
 @PluginDescriptor(
-	name = "OsLeague",
-	description = "Export Trailblazer League tasks to OsLeague importable format",
-	tags = {"task", "league", "trailblazer", "osleague"}
+	name = "OsLeague"
 )
 public class OsLeaguePlugin extends Plugin
 {
