@@ -33,8 +33,8 @@ import info.osleague.runelite.osleague.osleague.OsLeagueImport;
 import info.osleague.runelite.osleague.osleague.OsLeagueRelics;
 import info.osleague.runelite.osleague.osleague.OsLeagueTasks;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
-import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.Client;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.*;
 import net.runelite.client.eventbus.Subscribe;
@@ -80,11 +80,17 @@ public class OsLeaguePlugin extends Plugin
 	private List<Area> areas;
 
 	@Subscribe
-	public void onVarbitChanged(VarbitChanged event)
+	public void onGameStateChanged(GameStateChanged event)
 	{
-		// maybe do something
+		switch (event.getGameState())
+		{
+			case LOGGING_IN:
+			case LOGIN_SCREEN:
+				this.relics = null;
+				this.areas = null;
+				break;
+		}
 	}
-
 
 	@Override
 	protected void startUp() throws Exception
@@ -133,25 +139,25 @@ public class OsLeaguePlugin extends Plugin
 	{
 		if (widgetLoaded.getGroupId() == 657) //WidgetID.TRAILBLAZER_TASKS_GROUP_ID)
 		{
-			GatherTaskData();
+			this.tasks = gatherTaskData();
 		}
 		if (widgetLoaded.getGroupId() == 655) //WidgetID.TRAILBLAZER_RELICS_GROUP_ID)
 		{
-			GatherRelicData();
+			this.relics = gatherRelicData();
 		}
 		if (widgetLoaded.getGroupId() == 512) //WidgetID.TRAILBLAZER_AREAS_GROUP_ID)
 		{
-			GatherAreaData();
+			this.areas = gatherAreaData();
 		}
 	}
 
-	private void GatherAreaData()
+	private List<Area> gatherAreaData()
 	{
-		this.areas = new ArrayList<>();
+		List<Area> areas = new ArrayList<>();
 		Widget mapWidget = client.getWidget(512, 8); //WidgetInfo.TRAILBLAZER_AREAS_MAP);
 		if (mapWidget == null)
 		{
-			return;
+			return null;
 		}
 
 		Widget[] widgets = mapWidget.getStaticChildren();
@@ -163,15 +169,16 @@ public class OsLeaguePlugin extends Plugin
 				this.areas.add(area);
 			}
 		}
+		return areas;
 	}
 
-	private void GatherRelicData()
+	private List<Relic> gatherRelicData()
 	{
-		this.relics = new ArrayList<>();
+		List<Relic> relics = new ArrayList<>();
 		Widget relicIconsWidget = client.getWidget(651, 1);
 		if (relicIconsWidget == null)
 		{
-			return;
+			return null;
 		}
 
 		Widget[] widgets = relicIconsWidget.getDynamicChildren();
@@ -183,16 +190,18 @@ public class OsLeaguePlugin extends Plugin
 				this.relics.add(relic);
 			}
 		}
+
+		return relics;
 	}
 
-	private void GatherTaskData()
+	private Task[] gatherTaskData()
 	{
 		Widget taskLabelsWidget = client.getWidget(657, 10);
 		Widget taskPointsWidget = client.getWidget(657, 11);
 		Widget taskDifficultiesWidget = client.getWidget(657, 16);
 		if (taskLabelsWidget == null || taskPointsWidget == null || taskDifficultiesWidget == null)
 		{
-			return;
+			return null;
 		}
 
 		Widget[] taskLabels = taskLabelsWidget.getDynamicChildren();
@@ -200,10 +209,10 @@ public class OsLeaguePlugin extends Plugin
 		Widget[] taskDifficulties = taskDifficultiesWidget.getDynamicChildren();
 		if (taskLabels.length != taskPoints.length || taskPoints.length != taskDifficulties.length)
 		{
-			return;
+			return null;
 		}
 
-		tasks = new Task[taskLabels.length];
+		Task[] tasks = new Task[taskLabels.length];
 		for (int i = 0; i < taskLabels.length; i++)
 		{
 			String label = taskLabels[i].getText();
@@ -217,6 +226,8 @@ public class OsLeaguePlugin extends Plugin
 				taskDifficulties[i].getSpriteId());
 			tasks[i] = task;
 		}
+
+		return tasks;
 	}
 
 	private int getTaskPoints(Widget taskPoints)
@@ -231,21 +242,9 @@ public class OsLeaguePlugin extends Plugin
 
 	private boolean isTaskCompleted(Widget taskLabel)
 	{
-		String hexColor = Integer.toString(taskLabel.getTextColor(), 16);
-		return !hexColor.equals("9f9f9f");
+		return taskLabel.getTextColor() != 0x9f9f9f;
 	}
 
-	private boolean isRelicEnabled(Widget relic)
-	{
-		String hexColor = Integer.toString(relic.getTextColor(), 16);
-		return !hexColor.equals("aaaaaa");
-	}
-
-	/**
-	 * Open swing message box with specified message and copy data to clipboard
-	 *
-	 * @param message message to show
-	 */
 	private static void showMessageBox(final String title, final String message)
 	{
 		SwingUtilities.invokeLater(() ->
