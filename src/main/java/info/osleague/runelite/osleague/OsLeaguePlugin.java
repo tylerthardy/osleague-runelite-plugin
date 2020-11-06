@@ -11,7 +11,6 @@ import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetLoaded;
-import net.runelite.api.events.WidgetMenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
@@ -113,7 +112,7 @@ public class OsLeaguePlugin extends Plugin
 
 	private void sendTasksUpdatedMessage()
 	{
-		String chatMessage = this.tasks.size() + "/" + MAX_TASK_COUNT +	" tasks saved for export to OsLeague Tools";
+		String chatMessage = this.tasks.size() + "/" + MAX_TASK_COUNT +	" tasks saved for export to OS League Tools";
 		sendChatMessage(chatMessage, Color.BLUE);
 	}
 
@@ -158,7 +157,7 @@ public class OsLeaguePlugin extends Plugin
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
 
 		showMessageBox(
-			"OsLeague Data Exported!",
+			"OS League Tools Data Exported!",
 			"Exported data copied to clipboard! Go to osleague.tools, click Manage Data > Import from Runelite, and paste into the box."
 		);
 	}
@@ -246,7 +245,7 @@ public class OsLeaguePlugin extends Plugin
 		}
 		if (taskLabels.length != MAX_TASK_COUNT)
 		{
-			sendChatMessage("Could not gather tasks for OsLeague export. All filters must be set to 'All'.", Color.RED);
+			sendChatMessage("Could not gather tasks for OS League Tools export. All filters must be set to 'All'.", Color.RED);
 			return null;
 		}
 
