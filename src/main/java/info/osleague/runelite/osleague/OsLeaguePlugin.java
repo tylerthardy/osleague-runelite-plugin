@@ -1,9 +1,6 @@
 package info.osleague.runelite.osleague;
 
 import com.google.gson.Gson;
-import info.osleague.runelite.osleague.osleague.OsLeagueImport;
-import info.osleague.runelite.osleague.osleague.OsLeagueRelics;
-import info.osleague.runelite.osleague.osleague.OsLeagueTasks;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -147,12 +144,12 @@ public class OsLeaguePlugin extends Plugin
 
 		Gson gson = new Gson();
 
-		OsLeagueImport osLeagueImport = new OsLeagueImport();
-		osLeagueImport.unlockedRegions = gson.toJson(this.areas.stream().map(Area::getName).toArray());
-		osLeagueImport.unlockedRelics = gson.toJson(new OsLeagueRelics(this.relics));
-		osLeagueImport.tasks = gson.toJson(new OsLeagueTasks(this.tasks));
+		OsLeagueExport osLeagueExport = new OsLeagueExport();
+		osLeagueExport.areas = this.areas;
+		osLeagueExport.relics = this.relics;
+		osLeagueExport.tasks = this.tasks;
 
-		String json = gson.toJson(osLeagueImport);
+		String json = gson.toJson(osLeagueExport);
 		final StringSelection stringSelection = new StringSelection(json);
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
 
@@ -252,12 +249,9 @@ public class OsLeaguePlugin extends Plugin
 		List<Task> tasks = new ArrayList<>();
 		for (int i = 0; i < taskLabels.length; i++)
 		{
-			String label = taskLabels[i].getText();
-			int osLeagueIndex = i + RemappedTaskRange.getOffset(i);
+			String name = taskLabels[i].getText();
 			Task task = new Task(
-				i,
-				osLeagueIndex,
-				label,
+				i, name,
 				getTaskPoints(taskPoints[i]),
 				isTaskCompleted(taskLabels[i]),
 				taskDifficulties[i].getSpriteId());
