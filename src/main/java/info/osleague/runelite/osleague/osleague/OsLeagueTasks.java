@@ -2,7 +2,6 @@ package info.osleague.runelite.osleague.osleague;
 
 import info.osleague.runelite.osleague.Task;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
