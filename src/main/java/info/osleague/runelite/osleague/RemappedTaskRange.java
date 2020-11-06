@@ -74,7 +74,7 @@ public enum RemappedTaskRange
 	REMAPPED_RANGE_64(945, 948, -275),
 	REMAPPED_RANGE_65(949, 952, -435),
 	REMAPPED_RANGE_66(953, 956, -133),
-	REMAPPED_RANGE_67(957, 960, -1);
+	REMAPPED_RANGE_67(957, OsLeaguePlugin.MAX_TASK_COUNT, -1);
 
 	private final int beginId;
 	private final int endId;

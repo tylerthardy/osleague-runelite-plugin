@@ -5,10 +5,17 @@ import info.osleague.runelite.osleague.osleague.OsLeagueImport;
 import info.osleague.runelite.osleague.osleague.OsLeagueRelics;
 import info.osleague.runelite.osleague.osleague.OsLeagueTasks;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetLoaded;
-import net.runelite.api.widgets.*;
+import net.runelite.api.events.WidgetMenuOptionClicked;
+import net.runelite.api.widgets.Widget;
+import net.runelite.client.chat.ChatMessageBuilder;
+import net.runelite.client.chat.ChatMessageManager;
+import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -17,8 +24,9 @@ import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 
 import javax.inject.Inject;
-import javax.swing.SwingUtilities;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.image.BufferedImage;
@@ -35,6 +43,8 @@ import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 )
 public class OsLeaguePlugin extends Plugin
 {
+	public static final int MAX_TASK_COUNT = 961;
+
 	private static final Pattern POINTS_PATTERN = Pattern.compile("Reward: <col=ffffff>(\\d*) points<\\/col>");
 
 	@Inject
@@ -43,8 +53,12 @@ public class OsLeaguePlugin extends Plugin
 	@Inject
 	private ClientToolbar clientToolbar;
 
+	@Inject
+	private ChatMessageManager chatMessageManager;
+
 	private NavigationButton titleBarButton;
 
+	private boolean filtersRecentlySetToAll = false;
 	private List<Task> tasks;
 	private List<Relic> relics;
 	private List<Area> areas;
@@ -75,6 +89,51 @@ public class OsLeaguePlugin extends Plugin
 			.build();
 
 		clientToolbar.addNavigation(titleBarButton);
+	}
+
+	@Subscribe
+	public void onVarbitChanged(VarbitChanged event)
+	{
+		filtersRecentlySetToAll = this.getAllFiltersSetToAll();
+	}
+
+	@Subscribe
+	public void onGameTick(GameTick event)
+	{
+		if (filtersRecentlySetToAll && isTaskWindowOpen())
+		{
+			this.tasks = gatherTaskData();
+			if (this.tasks != null)
+			{
+				filtersRecentlySetToAll = false;
+				sendTasksUpdatedMessage();
+			}
+		}
+	}
+
+	private void sendTasksUpdatedMessage()
+	{
+		String chatMessage = this.tasks.size() + "/" + MAX_TASK_COUNT +	" tasks saved for export to OsLeague Tools";
+		sendChatMessage(chatMessage, Color.BLUE);
+	}
+
+	private boolean isTaskWindowOpen()
+	{
+		return client.getWidget(657, 10) != null;
+	}
+
+	private boolean getAllFiltersSetToAll()
+	{
+		/*
+			TRAILBLAZER_LEAGUE_TASK_TIER_FILTER(10033),
+			TRAILBLAZER_LEAGUE_TASK_TYPE_FILTER(11689),
+			TRAILBLAZER_LEAGUE_TASK_AREA_FILTER(11692),
+			TRAILBLAZER_LEAGUE_TASK_COMPLETED_FILTER(10034),
+		 */
+		return (client.getVarbitValue(10033) == 0 &&
+				client.getVarbitValue(11689) == 0 &&
+				client.getVarbitValue(11692) == 0 &&
+				client.getVarbitValue(10034) == 0);
 	}
 
 	private void copyJsonToClipboard()
@@ -110,6 +169,10 @@ public class OsLeaguePlugin extends Plugin
 		if (widgetLoaded.getGroupId() == 657) //WidgetID.TRAILBLAZER_TASKS_GROUP_ID)
 		{
 			this.tasks = gatherTaskData();
+			if (this.tasks != null)
+			{
+				sendTasksUpdatedMessage();
+			}
 		}
 		if (widgetLoaded.getGroupId() == 655) //WidgetID.TRAILBLAZER_RELICS_GROUP_ID)
 		{
@@ -181,6 +244,11 @@ public class OsLeaguePlugin extends Plugin
 		{
 			return null;
 		}
+		if (taskLabels.length != MAX_TASK_COUNT)
+		{
+			sendChatMessage("Could not gather tasks for OsLeague export. All filters must be set to 'All'.", Color.RED);
+			return null;
+		}
 
 		List<Task> tasks = new ArrayList<>();
 		for (int i = 0; i < taskLabels.length; i++)
@@ -223,5 +291,18 @@ public class OsLeaguePlugin extends Plugin
 				null,
 				message, title,
 				INFORMATION_MESSAGE));
+	}
+
+	private void sendChatMessage(String chatMessage, Color color)
+	{
+		final String message = new ChatMessageBuilder()
+				.append(color, chatMessage)
+				.build();
+
+		chatMessageManager.queue(
+				QueuedMessage.builder()
+						.type(ChatMessageType.CONSOLE)
+						.runeLiteFormattedMessage(message)
+						.build());
 	}
 }
