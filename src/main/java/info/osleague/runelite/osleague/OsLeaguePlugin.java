@@ -69,8 +69,7 @@ public class OsLeaguePlugin extends Plugin
 		{
 			case LOGGING_IN:
 			case LOGIN_SCREEN:
-				this.relics = null;
-				this.areas = null;
+				clearSavedData();
 				break;
 		}
 	}
@@ -88,6 +87,13 @@ public class OsLeaguePlugin extends Plugin
 			.build();
 
 		clientToolbar.addNavigation(titleBarButton);
+	}
+
+	@Override
+	protected void shutDown() throws Exception
+	{
+		clientToolbar.removeNavigation(titleBarButton);
+		clearSavedData();
 	}
 
 	@Subscribe
@@ -108,6 +114,14 @@ public class OsLeaguePlugin extends Plugin
 				sendTasksUpdatedMessage();
 			}
 		}
+	}
+
+	private void clearSavedData()
+	{
+		this.tasks = null;
+		this.relics = null;
+		this.areas = null;
+		filtersRecentlySetToAll = false;
 	}
 
 	private void sendTasksUpdatedMessage()
