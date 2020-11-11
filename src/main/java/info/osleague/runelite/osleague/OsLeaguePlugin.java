@@ -132,7 +132,8 @@ public class OsLeaguePlugin extends Plugin
 
 	private boolean isTaskWindowOpen()
 	{
-		return client.getWidget(657, 10) != null;
+		Widget widget = client.getWidget(657, 10);
+		return widget != null && !widget.isHidden();
 	}
 
 	private boolean getAllFiltersSetToAll()
