@@ -39,8 +39,6 @@ import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 )
 public class OsLeaguePlugin extends Plugin
 {
-	public static final int MAX_TASK_COUNT = 961;
-
 	private static final Pattern POINTS_PATTERN = Pattern.compile("Reward: <col=ffffff>(\\d*) points<\\/col>");
 
 	@Inject
@@ -123,7 +121,7 @@ public class OsLeaguePlugin extends Plugin
 
 	private void sendTasksUpdatedMessage()
 	{
-		String chatMessage = this.tasks.size() + "/" + MAX_TASK_COUNT +	" tasks saved for export to OS League Tools";
+		String chatMessage = "All tasks saved for export to OS League Tools";
 		sendChatMessage(chatMessage, Color.BLUE);
 	}
 
@@ -255,7 +253,7 @@ public class OsLeaguePlugin extends Plugin
 		{
 			return null;
 		}
-		if (taskLabels.length != MAX_TASK_COUNT)
+		if (!getAllFiltersSetToAll())
 		{
 			sendChatMessage("Could not gather tasks for OS League Tools export. All filters must be set to 'All'.", Color.RED);
 			return null;
